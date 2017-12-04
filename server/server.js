@@ -58,17 +58,25 @@ io.on('connection', (socket) => {
     });
     */
 
+    /*
     socket.emit('newMessage', {
         from: 'Me',
         text: 'See you then',
         createdAt: 123123
     });
+    */
 
     // newMessage server -> client
 
     // createMessage: client -> server
     socket.on('createMessage', (msg) => {
         console.log('createMessage', msg);
+
+        io.emit('newMessage', {
+            from: msg.from,
+            text: msg.text,
+            createdAd: new Date().getTime()
+        });
     });
 });
 
