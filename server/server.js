@@ -4,6 +4,9 @@ const socketIO   = require('socket.io');
 const publicPath = path.join(__dirname, '../public');
 const fs         = require('fs');
 
+
+const {generateMessage} = require('./utils/message');
+
 /**
  *
  * @type {*|createApplication}
@@ -68,28 +71,16 @@ io.on('connection', (socket) => {
 
     // newMessage server -> client
 
-    socket.emit('newMessage', {
-        from: 'Admin',
-        text: 'Welcome to the chat app',
-        createdAt: new Date().getTime()
-    });
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
 
-    socket.broadcast.emit('newMessage', {
-        from: 'Admin',
-        text: 'A new user joined',
-        createdAt: new Date().getTime()
-    });
+    // sent to all but not to himself
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user joined'));
 
     // createMessage: client -> server
     socket.on('createMessage', (msg) => {
         console.log('createMessage', msg);
 
-        io.emit('newMessage', {
-            from: msg.from,
-            text: msg.text,
-            createdAt: new Date().getTime()
-        });
-
+        io.emit('newMessage', generateMessage(msg.from, msg.text));
 
         /*
         socket.broadcast.emit('newMessage', {
