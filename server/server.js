@@ -31,30 +31,51 @@ var io = socketIO(server);
  */
 const port = process.env.PORT || 3000;
 
-/*
-app.get('/', (req, res) => {
-    fs.readFile(publicPath + '/index.html', 'utf8', (e, data) => {
-        res.send(data);
-    });
-});
-*/
-
 app.use(express.static(publicPath));
 
-//
-
+// handlers
 io.on('connection', (socket) => {
     console.log('New user connected');
-
 
     socket.on('disconnect', () => {
         console.log('User was disconnected.');
     });
+
+    socket.on('createEmail', (newEmail) => {
+        console.log('createEmail', newEmail);
+
+        //socket.emit('newEmail', newEmail);
+    });
+
+    // in real time you will able to pass, not only an event,
+    // but an event data from the server to the client (browser),
+    // something that we could never do with http request
+    /*
+    socket.emit('newEmail', {
+        from: 'fx@gmail.com',
+        text: 'Hey, you got an email',
+        createAt: 123
+    });
+    */
+
+    socket.emit('newMessage', {
+        from: 'Me',
+        text: 'See you then',
+        createdAt: 123123
+    });
+
+    // newMessage server -> client
+
+    // createMessage: client -> server
+    socket.on('createMessage', (msg) => {
+        console.log('createMessage', msg);
+    });
 });
 
+/*
 console.log(__dirname + '/../public');
 console.log(publicPath);
-
+*/
 
 module.exports = {
     app: app
