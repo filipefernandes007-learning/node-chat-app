@@ -17,4 +17,10 @@ describe('generateMessage', () => {
             createdAt: res.createdAt
         });
     });
+
+});
+
+describe('generateLocationMesage ')
+it('It should generate corrent location message', () => {
+
 });

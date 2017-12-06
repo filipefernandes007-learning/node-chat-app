@@ -5,7 +5,7 @@ const publicPath = path.join(__dirname, '../public');
 const fs         = require('fs');
 
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 
 /**
  *
@@ -77,10 +77,11 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user joined'));
 
     // createMessage: client -> server
-    socket.on('createMessage', (msg) => {
+    socket.on('createMessage', (msg, callback) => {
         console.log('createMessage', msg);
 
         io.emit('newMessage', generateMessage(msg.from, msg.text));
+        callback('This is from server.');
 
         /*
         socket.broadcast.emit('newMessage', {
@@ -89,6 +90,11 @@ io.on('connection', (socket) => {
             createdAt: new Date().getTime()
         });
         */
+    });
+
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage',
+                generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 });
 
