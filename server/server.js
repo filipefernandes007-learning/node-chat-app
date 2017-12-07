@@ -112,7 +112,11 @@ module.exports = {
  */
 
 if(!module.parent) {
-    var listener = server.listen(port, () => {
-        console.log('Server started on port %d', listener.address().port);
-    });
+    try {
+        var listener = server.listen(port, () => {
+            console.log('Server started on port %d', listener.address().port);
+        });
+    } catch(e) {
+        console.log(e.toString());
+    }
 }
