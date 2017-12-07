@@ -1,67 +1,60 @@
 var socket = io();
 
-socket.on('connect', function() {
-    console.log('Connected to server!');
+socket.on('connect', function () {
+  console.log('Connected to server');
 });
 
-socket.on('disconnect', function() {
-    console.log('Disconnected form server.');
+socket.on('disconnect', function () {
+  console.log('Disconnected from server');
 });
 
-// in real time you will able to pass, not only an event,
-// but an event data from the server to the client (browser),
-// something that we could never do with http request
-/*
-socket.on('newEmail', function(email) {
-    console.log('New email', email);
-});
-*/
+socket.on('newMessage', function (message) {
+  console.log('newMessage', message);
+  var li = jQuery('<li></li>');
+  li.text(`${message.from}: ${message.text}`);
 
-socket.on('newMessage', (msg) => {
-    console.log('newMessage', msg);
-
-    var li = $('<li></li>');
-    li.text(`${msg.from}: ${msg.text}`);
-    $('#messages').append(li);
+  jQuery('#messages').append(li);
 });
 
-socket.on('newLocationMessage', function(message) {
-    var li = $('<li></li>');
-    var a  = $('<a target="_blank"> My current location</a>');
+socket.on('newLocationMessage', function (message) {
+  var li = jQuery('<li></li>');
+  var a = jQuery('<a target="_blank">My current location</a>');
 
-    li.text(`${message.from}`);
-    a.attr('href', message.url);
-
-    li.append(a);
-    $('#messages').append(li);
+  li.text(`${message.from}: `);
+  a.attr('href', message.url);
+  li.append(a);
+  jQuery('#messages').append(li);
 });
 
-$('#message-form').on('submit', function(e) {
-    e.preventDefault();
+jQuery('#message-form').on('submit', function (e) {
+  e.preventDefault();
 
-    socket.emit('createMessage', {
-        from: 'User',
-        text: $('[name=message]').val()
-    }, function() {
+  var messageTextbox = jQuery('[name=message]');
 
+  socket.emit('createMessage', {
+    from: 'User',
+    text: messageTextbox.val()
+  }, function () {
+    messageTextbox.val('')
+  });
+});
+
+var locationButton = jQuery('#send-location');
+locationButton.on('click', function () {
+  if (!navigator.geolocation) {
+    return alert('Geolocation not supported by your browser.');
+  }
+
+  locationButton.attr('disabled', 'disabled').text('Sending location...');
+
+  navigator.geolocation.getCurrentPosition(function (position) {
+    locationButton.removeAttr('disabled').text('Send location');
+    socket.emit('createLocationMessage', {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
     });
-});
-
-var locationButton = $('#send-location');
-
-locationButton.on('click', function(e) {
-    if(!navigator.geolocation) {
-        return alert('Geolocation not supported by your browser.');
-    }
-
-    navigator.geolocation.getCurrentPosition(function(position) {
-        console.log(position);
-
-        socket.emit('createLocationMessage', {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-        });
-    }, function(e) {
-        alert('Unable to fetch location.');
-    });
+  }, function () {
+    locationButton.removeAttr('disabled').text('Send location');
+    alert('Unable to fetch location.');
+  });
 });
