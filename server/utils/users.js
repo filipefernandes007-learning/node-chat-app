@@ -93,6 +93,18 @@ class Users {
 
 		return namesArray;
 	}
+
+	getUserByName(name) {
+		var user = this.users.filter((user) => {
+			return user.name === name;
+		})[0];
+
+		if(user) {
+			return user;
+		}
+
+		return null;
+	}
 }
 
 module.exports = {Users};

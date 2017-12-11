@@ -82,6 +82,14 @@ io.on('connection', (socket) => {
             return callback('Name and room are required');
         }
 
+        var user = users.getUserByName(params.name);
+
+        if(user && user.id !== socket.id) {
+            return callback(`User ${user.name} already joined Chat App in room ${user.room}`);
+        }
+
+        console.log(user);
+
         socket.join(params.room);
         users.removeUser(socket.id);
 
